@@ -37,10 +37,30 @@ const findRoleByName = async (name) => {
   });
 };
 
+const findRoleById = async (id) => {
+  return await prisma.roles.findUnique({
+    where: {
+      id,
+    },
+  });
+};
+
+const deleteRoleRecords = async (ids) => {
+  return await prisma.roles.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+};
+
 module.exports = {
   findRoles,
   updatePenggunaCount,
   insertRole,
   deleteRoleId,
   findRoleByName,
+  findRoleById,
+  deleteRoleRecords,
 };

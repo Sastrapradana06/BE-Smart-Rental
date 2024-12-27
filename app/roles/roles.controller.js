@@ -1,9 +1,15 @@
 const env = require("dotenv").config();
 
 const express = require("express");
-const { getAllRoles, addRole, deleteRole } = require("./roles.services");
+const {
+  getAllRoles,
+  addRole,
+  deleteRole,
+  deleteRoleIds,
+} = require("./roles.services");
 const router = express.Router();
 const Joi = require("joi");
+const { authenticateToken } = require("../../middleware");
 
 const rolesSchema = Joi.object({
   name: Joi.string().required(),
@@ -11,13 +17,17 @@ const rolesSchema = Joi.object({
   pengguna: Joi.number().required(),
 }).strict();
 
-router.get("/", async (req, res) => {
+const recordsSchema = Joi.object({
+  ids: Joi.array().required(),
+}).strict();
+
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const result = await getAllRoles();
-    res.status(200).json({ message: "Success", data: result });
+    res.status(200).json({ status: true, message: "Success", data: result });
   } catch (error) {
     console.log(error);
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ status: false, message: error.message });
   }
 });
 
@@ -26,18 +36,44 @@ router.post("/", async (req, res) => {
 
   if (error) {
     return res.status(400).json({
+      status: false,
       error: `${error.details.map((detail) => detail.message)}`,
     });
   }
 
   try {
     await addRole(value);
-    res.status(200).json({ message: "Success add role" });
+    res.status(200).json({ status: true, message: "Success add role" });
   } catch (error) {
     console.log(error);
     res.status(error.code == "P2002" ? 400 : 500).json({
+      status: false,
       message:
         error.code == "P2002" ? "Role already exists" : "Failed to add role",
+    });
+  }
+});
+
+router.post("/delete-records", async (req, res) => {
+  console.log(req.body);
+
+  const { value, error } = recordsSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      status: false,
+      message: `${error.details.map((detail) => detail.message)}`,
+    });
+  }
+
+  try {
+    await deleteRoleIds(value);
+    res.status(200).json({ status: true, message: "Success delete role" });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      status: false,
+      message: error.code === "P2025" ? "Role not found" : error.message,
     });
   }
 });
@@ -46,15 +82,13 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     await deleteRole(Number(id));
-    res.status(200).json({ message: "Success delete role" });
+    res.status(200).json({ status: true, message: "Success delete role" });
   } catch (error) {
     console.log(error);
-    res
-      .status(400)
-      .json({
-        message:
-          error.code === "P2025" ? "Role not found" : "Failed to delete role",
-      });
+    res.status(400).json({
+      status: false,
+      message: error.code === "P2025" ? "Role not found" : error.message,
+    });
   }
 });
 

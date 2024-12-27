@@ -38,7 +38,7 @@ const loginUser = async (email, password) => {
     { id: user.id, name: user.name },
     process.env.JWT_SECRET,
     {
-      expiresIn: "1h",
+      expiresIn: "1d",
     }
   );
 

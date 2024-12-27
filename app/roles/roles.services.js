@@ -1,10 +1,13 @@
 const { formatDate } = require("../../utils");
+const { findUserByRole } = require("../users/users.repository");
 const {
   findRoles,
   insertRole,
   deleteRoleId,
   updatePenggunaCount,
   findRoleByName,
+  findRoleById,
+  deleteRoleRecords,
 } = require("./roles.repository");
 
 const getAllRoles = async () => {
@@ -40,8 +43,49 @@ const addRole = async (dataRole) => {
 };
 
 const deleteRole = async (id) => {
+  const roles = await findRoleById(id);
+
+  if (!roles) {
+    throw new Error("Role not found");
+  }
+
+  const isUseRoleUser = await findUserByRole(roles.name);
+  console.log({ isUseRoleUser });
+
+  if (isUseRoleUser) {
+    throw new Error("Role in use by user");
+  }
+
   const deleted = await deleteRoleId(id);
-  console.log(deleted);
+  return deleted;
+};
+
+const deleteRoleIds = async (data) => {
+  const ids = data.ids.map((id) => {
+    return Number(id);
+  });
+
+  let isUseRole = 0;
+
+  const tes = ids.map(async (id) => {
+    const getRoles = await findRoleById(id);
+
+    if (getRoles) {
+      const getRoleUser = await findUserByRole(getRoles.name);
+      if (getRoleUser) {
+        return (isUseRole += 1);
+      }
+    }
+  });
+
+  await Promise.all(tes);
+
+  if (isUseRole > 0) {
+    throw new Error("roles are still used by users");
+  }
+
+  const deleted = await deleteRoleRecords(ids);
+
   return deleted;
 };
 
@@ -75,4 +119,5 @@ module.exports = {
   deleteRole,
   modifyPenggunaCount,
   matchIsRole,
+  deleteRoleIds,
 };
