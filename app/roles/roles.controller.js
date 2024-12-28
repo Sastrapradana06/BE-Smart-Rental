@@ -6,6 +6,7 @@ const {
   addRole,
   deleteRole,
   deleteRoleIds,
+  getRoleName,
 } = require("./roles.services");
 const router = express.Router();
 const Joi = require("joi");
@@ -24,6 +25,17 @@ const recordsSchema = Joi.object({
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const result = await getAllRoles();
+    res.status(200).json({ status: true, message: "Success", data: result });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ status: false, message: error.message });
+  }
+});
+
+router.get("/:name", authenticateToken, async (req, res) => {
+  const { name } = req.params;
+  try {
+    const result = await getRoleName(name.toLocaleLowerCase());
     res.status(200).json({ status: true, message: "Success", data: result });
   } catch (error) {
     console.log(error);

@@ -113,6 +113,15 @@ const matchIsRole = async (name) => {
   return role;
 };
 
+const getRoleName = async (roleName) => {
+  const role = await findRoleByName(roleName);
+
+  if (!role) {
+    throw new Error("Role not found");
+  }
+  return role;
+};
+
 module.exports = {
   getAllRoles,
   addRole,
@@ -120,4 +129,5 @@ module.exports = {
   modifyPenggunaCount,
   matchIsRole,
   deleteRoleIds,
+  getRoleName,
 };

@@ -29,10 +29,10 @@ const updatePenggunaCount = async (name, count) => {
   });
 };
 
-const findRoleByName = async (name) => {
+const findRoleByName = async (nameRole) => {
   return await prisma.roles.findUnique({
     where: {
-      name,
+      name: nameRole,
     },
   });
 };
