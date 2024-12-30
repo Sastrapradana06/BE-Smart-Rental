@@ -30,10 +30,21 @@ const deleteUserById = async (id) => {
   });
 };
 
+const deleteUsersRecords = async (ids) => {
+  return await prisma.user.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+};
+
 module.exports = {
   insertUser,
   findUsers,
   findUserByEmail,
   deleteUserById,
   findUserByRole,
+  deleteUsersRecords,
 };

@@ -67,8 +67,6 @@ router.post("/", async (req, res) => {
 });
 
 router.post("/delete-records", async (req, res) => {
-  console.log(req.body);
-
   const { value, error } = recordsSchema.validate(req.body);
 
   if (error) {

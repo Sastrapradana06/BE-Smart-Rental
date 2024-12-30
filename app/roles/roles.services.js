@@ -13,8 +13,6 @@ const {
 const getAllRoles = async () => {
   const get = await findRoles();
 
-  console.log({ get });
-
   if (!get) {
     throw new Error("Roles not found");
   }

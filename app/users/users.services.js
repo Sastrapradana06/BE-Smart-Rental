@@ -1,7 +1,12 @@
 const { formatDate } = require("../../utils");
 const prisma = require("../db/prisma");
 const { modifyPenggunaCount, matchIsRole } = require("../roles/roles.services");
-const { findUsers, insertUser, deleteUserById } = require("./users.repository");
+const {
+  findUsers,
+  insertUser,
+  deleteUserById,
+  deleteUsersRecords,
+} = require("./users.repository");
 const bcrypt = require("bcryptjs");
 
 const addUsers = async (data) => {
@@ -9,7 +14,8 @@ const addUsers = async (data) => {
 
   await matchIsRole(roles);
 
-  const password = roles.replace(/\s+/g, "");
+  const password = roles.replace(/\s+/g, "") + "123";
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const dataUser = {
@@ -34,6 +40,18 @@ const deleteUser = async (id) => {
   return deleted;
 };
 
+const deleteUsersIds = async (data) => {
+  console.log({ data });
+
+  const ids = data.ids.map((id) => {
+    return Number(id);
+  });
+  console.log({ data, ids });
+
+  const deleted = await deleteUsersRecords(ids);
+  return deleted;
+};
+
 const getUsers = async () => {
   const get = await findUsers();
   const users = get.map((user) => {
@@ -55,4 +73,5 @@ module.exports = {
   getUsers,
   addUsers,
   deleteUser,
+  deleteUsersIds,
 };

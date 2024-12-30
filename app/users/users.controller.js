@@ -1,5 +1,10 @@
 const express = require("express");
-const { getUsers, addUsers, deleteUser } = require("./users.services");
+const {
+  getUsers,
+  addUsers,
+  deleteUser,
+  deleteUsersIds,
+} = require("./users.services");
 const router = express.Router();
 const Joi = require("joi");
 const { authenticateToken } = require("../../middleware");
@@ -11,6 +16,10 @@ const addUserSchema = Joi.object({
   jekel: Joi.string().required(),
   alamat: Joi.string().required(),
   roles: Joi.string().required(),
+}).strict();
+
+const recordsSchema = Joi.object({
+  ids: Joi.array().required(),
 }).strict();
 
 router.get("/", authenticateToken, async (req, res) => {
@@ -41,6 +50,32 @@ router.post("/", async (req, res) => {
     res.status(error.code == "P2002" ? 400 : 500).json({
       status: false,
       message: error.code == "P2002" ? `Email already exists` : error.message,
+    });
+  }
+});
+
+router.post("/delete-records", async (req, res) => {
+  const { value, error } = recordsSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      status: false,
+      message: `${error.details.map((detail) => detail.message)}`,
+    });
+  }
+
+  console.log({ value });
+
+  try {
+    await deleteUsersIds(value);
+    res
+      .status(200)
+      .json({ status: true, message: "Success delete users records" });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      status: false,
+      message: error.message,
     });
   }
 });
