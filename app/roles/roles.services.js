@@ -8,6 +8,7 @@ const {
   findRoleByName,
   findRoleById,
   deleteRoleRecords,
+  updateRole,
 } = require("./roles.repository");
 
 const getAllRoles = async () => {
@@ -27,6 +28,7 @@ const getAllRoles = async () => {
       name: role.name,
       permissions: role.permissions,
       pengguna: role.pengguna,
+      color: role.color,
       created_at: formatDate(role.created_at),
       updated_at: formatDate(role.updated_at),
     };
@@ -120,6 +122,20 @@ const getRoleName = async (roleName) => {
   return role;
 };
 
+const getRoleId = async (idRole) => {
+  const role = await findRoleById(idRole);
+
+  if (!role) {
+    throw new Error("Role not found");
+  }
+  return role;
+};
+
+const editRole = async (id, data) => {
+  const edit = await updateRole(id, data);
+  return edit;
+};
+
 module.exports = {
   getAllRoles,
   addRole,
@@ -128,4 +144,6 @@ module.exports = {
   matchIsRole,
   deleteRoleIds,
   getRoleName,
+  getRoleId,
+  editRole,
 };

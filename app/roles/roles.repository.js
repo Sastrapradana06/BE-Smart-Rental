@@ -1,7 +1,17 @@
 const prisma = require("../db/prisma");
 
 const findRoles = async () => {
-  return await prisma.roles.findMany();
+  return await prisma.roles.findMany({
+    select: {
+      id: true,
+      name: true,
+      permissions: true,
+      pengguna: true,
+      color: true,
+      created_at: true,
+      updated_at: true,
+    },
+  });
 };
 
 const insertRole = async (dataRole) => {
@@ -55,6 +65,15 @@ const deleteRoleRecords = async (ids) => {
   });
 };
 
+const updateRole = async (id, dataUpdate) => {
+  return await prisma.roles.update({
+    where: {
+      id,
+    },
+    data: dataUpdate,
+  });
+};
+
 module.exports = {
   findRoles,
   updatePenggunaCount,
@@ -63,4 +82,5 @@ module.exports = {
   findRoleByName,
   findRoleById,
   deleteRoleRecords,
+  updateRole,
 };
