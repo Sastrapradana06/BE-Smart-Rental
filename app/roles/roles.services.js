@@ -89,23 +89,29 @@ const deleteRoleIds = async (data) => {
   return deleted;
 };
 
-const modifyPenggunaCount = async (name, type) => {
-  const role = await findRoleByName(name);
+// const modifyPenggunaCount = async (name, type) => {
+//   const role = await findRoleByName(name);
 
-  if (!role) {
-    throw new Error("Role not found");
-  }
+//   if (!role) {
+//     throw new Error("Role not found");
+//   }
 
-  const newPengguna =
-    type === "increment" ? role.pengguna + 1 : role.pengguna - 1;
+//   const newPengguna =
+//     type === "increment" ? role.pengguna + 1 : role.pengguna - 1;
 
-  const proccess = await updatePenggunaCount(name, newPengguna);
-  return proccess;
+//   console.log({ name, newPengguna, role });
+
+//   const proccess = await updatePenggunaCount(name, newPengguna);
+//   return proccess;
+// };
+
+const modifyPenggunaCount = async (name, count) => {
+  const process = await updatePenggunaCount(name, count);
+  return process;
 };
 
 const matchIsRole = async (name) => {
   const role = await findRoleByName(name);
-  console.log({ role });
 
   if (!role) {
     throw new Error("Role not found");

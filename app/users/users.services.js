@@ -6,6 +6,7 @@ const {
   insertUser,
   deleteUserById,
   deleteUsersRecords,
+  findUserById,
 } = require("./users.repository");
 const bcrypt = require("bcryptjs");
 
@@ -29,7 +30,7 @@ const addUsers = async (data) => {
   };
 
   const result = await insertUser(dataUser);
-  await modifyPenggunaCount(roles, "increment");
+  await modifyPenggunaCount(roles, 1);
 
   return result;
 };
@@ -40,13 +41,45 @@ const deleteUser = async (id) => {
   return deleted;
 };
 
-const deleteUsersIds = async (data) => {
-  console.log({ data });
+// const deleteUsersIds = async (data) => {
+//   const ids = data.ids.map((id) => {
+//     return Number(id);
+//   });
 
-  const ids = data.ids.map((id) => {
-    return Number(id);
+//   const handleCount = ids.map(async (id) => {
+//     const getUser = await findUserById(id);
+//     console.log({ getUser });
+
+//     if (getUser) {
+//       await modifyPenggunaCount(getUser.roles, "decrement");
+//     }
+//   });
+
+//   await Promise.all(handleCount);
+
+//   const deleted = await deleteUsersRecords(ids);
+//   return deleted;
+// };
+
+const deleteUsersIds = async (data) => {
+  const ids = data.ids.map(Number);
+
+  const users = await Promise.all(ids.map((id) => findUserById(id)));
+
+  const roleCounts = {};
+  users.forEach((user) => {
+    if (user) {
+      roleCounts[user.roles] = (roleCounts[user.roles] || 0) - 1;
+    }
   });
-  console.log({ data, ids });
+
+  console.log({ roleCounts });
+
+  await Promise.all(
+    Object.entries(roleCounts).map(([role, count]) =>
+      modifyPenggunaCount(role, count)
+    )
+  );
 
   const deleted = await deleteUsersRecords(ids);
   return deleted;

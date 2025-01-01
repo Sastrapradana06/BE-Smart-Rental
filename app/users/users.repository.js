@@ -14,6 +14,10 @@ const findUserByEmail = async (email) => {
   return await prisma.user.findUnique({ where: { email } });
 };
 
+const findUserById = async (id) => {
+  return await prisma.user.findUnique({ where: { id } });
+};
+
 const findUserByRole = async (role) => {
   return await prisma.user.findFirst({
     where: {
@@ -44,7 +48,8 @@ module.exports = {
   insertUser,
   findUsers,
   findUserByEmail,
-  deleteUserById,
   findUserByRole,
+  findUserById,
+  deleteUserById,
   deleteUsersRecords,
 };

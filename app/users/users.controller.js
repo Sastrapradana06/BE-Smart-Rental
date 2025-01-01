@@ -64,8 +64,6 @@ router.post("/delete-records", async (req, res) => {
     });
   }
 
-  console.log({ value });
-
   try {
     await deleteUsersIds(value);
     res

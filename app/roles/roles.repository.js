@@ -28,14 +28,38 @@ const deleteRoleId = async (id) => {
   });
 };
 
+// const updatePenggunaCount = async (name, count) => {
+//   return await prisma.roles.update({
+//     where: {
+//       name,
+//     },
+//     data: {
+//       pengguna: count,
+//     },
+//   });
+// };
+
 const updatePenggunaCount = async (name, count) => {
-  return await prisma.roles.update({
-    where: {
-      name,
-    },
-    data: {
-      pengguna: count,
-    },
+  return await prisma.$transaction(async (tx) => {
+    const role = await tx.roles.findUnique({
+      where: { name },
+    });
+
+    if (!role) {
+      throw new Error("Role not found");
+    }
+
+    const newCount = role.pengguna + count;
+    console.log({ newCount });
+
+    return await tx.roles.update({
+      where: {
+        name,
+      },
+      data: {
+        pengguna: newCount,
+      },
+    });
   });
 };
 
