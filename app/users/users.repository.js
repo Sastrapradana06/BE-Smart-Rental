@@ -15,7 +15,18 @@ const findUserByEmail = async (email) => {
 };
 
 const findUserById = async (id) => {
-  return await prisma.user.findUnique({ where: { id } });
+  return await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      notel: true,
+      jekel: true,
+      alamat: true,
+      roles: true,
+    },
+  });
 };
 
 const findUserByRole = async (role) => {
@@ -44,6 +55,15 @@ const deleteUsersRecords = async (ids) => {
   });
 };
 
+const updateUser = async (id, newData) => {
+  await prisma.user.update({
+    where: {
+      id,
+    },
+    data: newData,
+  });
+};
+
 module.exports = {
   insertUser,
   findUsers,
@@ -52,4 +72,5 @@ module.exports = {
   findUserById,
   deleteUserById,
   deleteUsersRecords,
+  updateUser,
 };

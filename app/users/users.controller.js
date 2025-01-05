@@ -4,6 +4,8 @@ const {
   addUsers,
   deleteUser,
   deleteUsersIds,
+  getUserById,
+  editUser,
 } = require("./users.services");
 const router = express.Router();
 const Joi = require("joi");
@@ -25,6 +27,16 @@ const recordsSchema = Joi.object({
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const dataUsers = await getUsers();
+    res.status(200).json({ status: true, message: "Success", data: dataUsers });
+  } catch (error) {
+    res.status(400).json({ status: false, message: "Invalid" });
+  }
+});
+
+router.get("/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const dataUsers = await getUserById(Number(id));
     res.status(200).json({ status: true, message: "Success", data: dataUsers });
   } catch (error) {
     res.status(400).json({ status: false, message: "Invalid" });
@@ -88,6 +100,31 @@ router.delete("/:id", async (req, res) => {
     res.status(400).json({
       message:
         error.code === "P2025" ? "User not found" : "Failed to delete user",
+    });
+  }
+});
+
+router.put("/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { value, error } = addUserSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      status: false,
+      message: `${error.details.map((detail) => detail.message)}`,
+    });
+  }
+
+  try {
+    const result = await editUser(Number(id), value);
+    res
+      .status(200)
+      .json({ status: true, message: "Success edit user", data: result });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      status: false,
+      message: error.message,
     });
   }
 });

@@ -7,8 +7,17 @@ const {
   deleteUserById,
   deleteUsersRecords,
   findUserById,
+  updateUser,
 } = require("./users.repository");
 const bcrypt = require("bcryptjs");
+
+const getUserById = async (id) => {
+  const user = await findUserById(id);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user;
+};
 
 const addUsers = async (data) => {
   const { name, email, notel, jekel, alamat, roles } = data;
@@ -73,8 +82,6 @@ const deleteUsersIds = async (data) => {
     }
   });
 
-  console.log({ roleCounts });
-
   await Promise.all(
     Object.entries(roleCounts).map(([role, count]) =>
       modifyPenggunaCount(role, count)
@@ -102,9 +109,16 @@ const getUsers = async () => {
   return users;
 };
 
+const editUser = async (id, data) => {
+  const edit = await updateUser(id, data);
+  return edit;
+};
+
 module.exports = {
   getUsers,
   addUsers,
   deleteUser,
   deleteUsersIds,
+  getUserById,
+  editUser,
 };
