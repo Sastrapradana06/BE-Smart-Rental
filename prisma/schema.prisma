@@ -28,3 +28,18 @@ model Roles {
   updated_at  DateTime @updatedAt
   color       String   @default("yellow")
 }
+
+model Unit {
+  id                Int     @id @default(autoincrement())
+  nama              String
+  no_plat           String  @unique
+  tahun             String
+  jenis             String
+  transmisi         String
+  jumlah_pintu      Int
+  jumlah_kursi      Int
+  harga             Int
+  jumlah_total      Int
+  jumlah_tersedia   Int
+  jumlah_disewa     Int     @default(0)
+}
